@@ -6,10 +6,13 @@ import avl1.util.JPAUtil;
 import jakarta.persistence.EntityManager;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.List;
 import java.util.Scanner;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
+//Abel Baes Correa - SC3039307
+//Francisco Guatura Maldonado - SC3039111
+
 public class Main {
 
     public static void main(String[] args) {
@@ -22,13 +25,13 @@ public class Main {
         int choice = scanner.nextInt();
         scanner.nextLine();
 
-        while(choice == 6){
+        while(choice != 6){
             switch (choice) {
                 case 1 -> cadastrarAluno(alunoDAO);
                 case 2-> excluirAluno(alunoDAO);
-                case 3 -> alterarAluno();
-                case 4 -> buscarAluno();
-                case 5 -> listarAluno();
+                case 3 -> alterarAluno(alunoDAO);
+                case 4 -> buscarAluno(alunoDAO);
+                case 5 -> listarAluno(alunoDAO);
                 default -> System.out.println("Escolha Inválida");
             }
             menu();
@@ -42,9 +45,7 @@ public class Main {
 
         Scanner scanner = new Scanner(System.in);
 
-        EntityManager em = JPAUtil.getEntityManager();
-
-        System.out.println("CADASTRO DE ALUNO:");
+        System.out.println("CADASTRO DE ALUNO:\n");
         System.out.println("Digite o nome: ");
         String nome = scanner.nextLine();
 
@@ -69,32 +70,63 @@ public class Main {
         Aluno aluno = new Aluno(nome,ra,email,nota1,nota2,nota3);
 
         alunoDAO.cadastrar(aluno);
-        scanner.close();
     }
 
     private static void excluirAluno(AlunoDAO alunoDAO) {
 
         Scanner scanner = new Scanner(System.in);
 
-        System.out.println("EXCLUIR ALUNO:");
+        System.out.println("EXCLUIR ALUNO:\n");
         System.out.println("Digite o nome: ");
         String nome = scanner.nextLine();
 
         alunoDAO.excluir(nome);
-
-        scanner.close();
-
     }
 
-    private static void alterarAluno() {
+    private static void alterarAluno(AlunoDAO alunoDAO) {
+        Scanner scanner = new Scanner(System.in);
 
+        System.out.println("Digite o nome do aluno que deseja alterar: ");
+        String nomeAluno = scanner.nextLine();
+
+        alunoDAO.alterar(nomeAluno);
     }
 
-    private static void buscarAluno() {
+    private static void buscarAluno(AlunoDAO alunoDAO) {
 
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Consultar Aluno:\n");
+        System.out.println("Digite o nome: ");
+        String nome = scanner.nextLine();
+
+        Aluno aluno = alunoDAO.buscarPorNome(nome).getFirst();
+
+        System.out.println(aluno.toString());
     }
 
-    private static void listarAluno() {
+    private static void listarAluno(AlunoDAO alunoDAO) {
+
+        List<Aluno> alunos = alunoDAO.listarTodosAlunos();
+
+        if (alunos.isEmpty()) {
+            System.out.println("Não existem alunos cadastrados");
+            return;
+        }
+
+        System.out.println("\nExibindo todos os alunos:\n");
+
+        alunos.forEach(aluno -> {
+            BigDecimal media = aluno.getNota1()
+                                    .add(aluno.getNota2())
+                                    .add(aluno.getNota3())
+                                    .divide(BigDecimal.valueOf(3), 2, RoundingMode.HALF_UP);
+
+            String aprovacao = media.compareTo(BigDecimal.valueOf(6)) >= 0 ? "Aprovado"
+                            : media.compareTo(BigDecimal.valueOf(4)) >= 0 ? "Recuperação" : "Reprovado";
+
+            System.out.println(aluno.toString() + "Média: " + media + "\n" + "Situação: " + aprovacao + "\n");
+        });
 
     }
 

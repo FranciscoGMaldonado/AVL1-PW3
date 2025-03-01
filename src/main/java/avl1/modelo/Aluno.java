@@ -17,6 +17,8 @@ public class Aluno {
     private BigDecimal nota2;
     private BigDecimal nota3;
 
+    public Aluno() {}
+
     public Aluno(String nome, String ra, String email, BigDecimal nota1, BigDecimal nota2, BigDecimal nota3) {
         this.nome = nome;
         this.ra = ra;
@@ -53,5 +55,13 @@ public class Aluno {
     public BigDecimal getNota3() { return nota3; }
 
     public void setNota3(BigDecimal nota3) { this.nota3 = nota3; }
+
+    @Override
+    public String toString() {
+        return "Nome: " + nome + "\n" +
+                "Email: " + email + "\n" +
+                "RA: " + ra + "\n" +
+                "Notas: " + nota1 + " - " + nota2 + " - " + nota3 + "\n";
+    }
 }
 
