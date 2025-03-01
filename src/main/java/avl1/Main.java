@@ -15,13 +15,13 @@ import java.util.Scanner;
 
 public class Main {
 
+    private static EntityManager em = JPAUtil.getEntityManager();
+    private static AlunoDAO alunoDAO = new AlunoDAO(em);
+    private static Scanner scanner = new Scanner(System.in);
+
     public static void main(String[] args) {
 
-        EntityManager em = JPAUtil.getEntityManager();
-        AlunoDAO alunoDAO = new AlunoDAO(em);
-
         menu();
-        Scanner scanner = new Scanner(System.in);
         int choice = scanner.nextInt();
         scanner.nextLine();
 
@@ -42,8 +42,6 @@ public class Main {
     }
 
     private static void cadastrarAluno(AlunoDAO alunoDAO) {
-
-        Scanner scanner = new Scanner(System.in);
 
         System.out.println("CADASTRO DE ALUNO:\n");
         System.out.println("Digite o nome: ");
@@ -74,8 +72,6 @@ public class Main {
 
     private static void excluirAluno(AlunoDAO alunoDAO) {
 
-        Scanner scanner = new Scanner(System.in);
-
         System.out.println("EXCLUIR ALUNO:\n");
         System.out.println("Digite o nome: ");
         String nome = scanner.nextLine();
@@ -84,7 +80,6 @@ public class Main {
     }
 
     private static void alterarAluno(AlunoDAO alunoDAO) {
-        Scanner scanner = new Scanner(System.in);
 
         System.out.println("Digite o nome do aluno que deseja alterar: ");
         String nomeAluno = scanner.nextLine();
@@ -94,13 +89,17 @@ public class Main {
 
     private static void buscarAluno(AlunoDAO alunoDAO) {
 
-        Scanner scanner = new Scanner(System.in);
-
         System.out.println("Consultar Aluno:\n");
         System.out.println("Digite o nome: ");
         String nome = scanner.nextLine();
 
-        Aluno aluno = alunoDAO.buscarPorNome(nome).getFirst();
+        List<Aluno> buscaAluno = alunoDAO.buscarPorNome(nome);
+        if (buscaAluno.isEmpty()) {
+            System.out.println("Não existem alunos cadastrados");
+            return;
+        }
+
+        Aluno aluno = buscaAluno.getFirst();
 
         System.out.println(aluno.toString());
     }
@@ -118,12 +117,12 @@ public class Main {
 
         alunos.forEach(aluno -> {
             BigDecimal media = aluno.getNota1()
-                                    .add(aluno.getNota2())
-                                    .add(aluno.getNota3())
-                                    .divide(BigDecimal.valueOf(3), 2, RoundingMode.HALF_UP);
+                    .add(aluno.getNota2())
+                    .add(aluno.getNota3())
+                    .divide(BigDecimal.valueOf(3), 2, RoundingMode.HALF_UP);
 
             String aprovacao = media.compareTo(BigDecimal.valueOf(6)) >= 0 ? "Aprovado"
-                            : media.compareTo(BigDecimal.valueOf(4)) >= 0 ? "Recuperação" : "Reprovado";
+                    : media.compareTo(BigDecimal.valueOf(4)) >= 0 ? "Recuperação" : "Reprovado";
 
             System.out.println(aluno.toString() + "Média: " + media + "\n" + "Situação: " + aprovacao + "\n");
         });

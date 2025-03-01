@@ -45,12 +45,13 @@ public class AlunoDAO {
     public void alterar(String nomeAluno){
 
         Scanner scanner = new Scanner(System.in);
-        em.getTransaction().begin();
-        Aluno aluno = buscarPorNome(nomeAluno).getFirst();
-        if(aluno == null){
+        List<Aluno> buscaAluno = buscarPorNome(nomeAluno);
+        if(buscaAluno.isEmpty()){
             System.out.println("Aluno não encontrado.");
             return;
         }
+
+        Aluno aluno = buscaAluno.getFirst();
 
         System.out.println(aluno.toString());
 
@@ -72,6 +73,7 @@ public class AlunoDAO {
         System.out.println("Digite a nota 3: ");
         aluno.setNota3(scanner.nextBigDecimal());
 
+        em.getTransaction().begin();
         em.merge(aluno);
         em.getTransaction().commit();
 
